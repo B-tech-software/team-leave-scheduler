@@ -1,15 +1,63 @@
-<!DOCTYPE html>
-<html>
-<head>
-    <title>
-        Team Leave Schedular
-    </title>
-</head>
-<body>
-   
-</body>
+{% extends "base.html" %}
 
+{% block content %}
 
+<h2>Approved Leave</h2>
 
+<ul>
 
-</html>
+{% for leave in approved_requests %}
+
+<li>
+
+{{ leave.employee.name }}
+
+|
+
+{{ leave.start_date }}
+
+→
+
+{{ leave.end_date }}
+
+</li>
+
+{% else %}
+
+<li>No approved leave.</li>
+
+{% endfor %}
+
+</ul>
+
+<hr>
+
+<h2>Pending Requests</h2>
+
+<ul>
+
+{% for leave in pending_requests %}
+
+<li>
+
+{{ leave.employee.name }}
+
+|
+
+{{ leave.start_date }}
+
+→
+
+{{ leave.end_date }}
+
+</li>
+
+{% else %}
+
+<li>No pending requests.</li>
+
+{% endfor %}
+
+</ul>
+
+{% endblock %}
