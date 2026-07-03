@@ -2,25 +2,58 @@
 
 {% block content %}
 
+<h2>Next 30 Days</h2>
+
+<h3>Submit Leave Request</h3>
+<form method="post" action="/api/leave-requests">
+	<input type="hidden" name="_browser" value="1">
+	<label for="employee_id">Employee</label>
+	<select id="employee_id" name="employee_id" required>
+		<option value="">Select employee</option>
+		{% for employee in employees %}
+		<option value="{{ employee.id }}">{{ employee.name }} - {{ employee.team }}</option>
+		{% endfor %}
+	</select>
+
+	<label for="start_date">Start date</label>
+	<input id="start_date" name="start_date" type="date" required>
+
+	<label for="end_date">End date</label>
+	<input id="end_date" name="end_date" type="date" required>
+
+	<button type="submit">Submit request</button>
+</form>
+
+<table border="1" cellpadding="4">
+	<tr>
+		<th>Date</th>
+		<th>Working Day</th>
+		<th>Holiday</th>
+		<th>Engineering</th>
+		<th>Finance</th>
+		<th>Operations</th>
+	</tr>
+	{% for day in calendar_days %}
+	<tr>
+		<td>{{ day.date }}</td>
+		<td>{{ 'Yes' if day.working_day else 'No' }}</td>
+		<td>{{ day.holiday or '-' }}</td>
+		<td>{{ day.team_leaves.get('Engineering', [])|join(', ') or '-' }}</td>
+		<td>{{ day.team_leaves.get('Finance', [])|join(', ') or '-' }}</td>
+		<td>{{ day.team_leaves.get('Operations', [])|join(', ') or '-' }}</td>
+	</tr>
+	{% endfor %}
+</table>
+
+<hr>
+
 <h2>Approved Leave</h2>
 
 <ul>
 
 {% for leave in approved_requests %}
 
-<li>
-
-{{ leave.employee.name }}
-
-|
-
-{{ leave.start_date }}
-
-→
-
-{{ leave.end_date }}
-
-</li>
+<li>{{ leave.employee.name }} | {{ leave.start_date }} → {{ leave.end_date }}</li>
 
 {% else %}
 
@@ -39,17 +72,15 @@
 {% for leave in pending_requests %}
 
 <li>
-
-{{ leave.employee.name }}
-
-|
-
-{{ leave.start_date }}
-
-→
-
-{{ leave.end_date }}
-
+	{{ leave.employee.name }} | {{ leave.start_date }} → {{ leave.end_date }}
+	<form method="post" action="/api/leave-requests/{{ leave.id }}/approve">
+		<input type="hidden" name="_browser" value="1">
+		<button type="submit">Approve</button>
+	</form>
+	<form method="post" action="/api/leave-requests/{{ leave.id }}/reject">
+		<input type="hidden" name="_browser" value="1">
+		<button type="submit">Reject</button>
+	</form>
 </li>
 
 {% else %}
